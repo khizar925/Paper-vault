@@ -317,7 +317,20 @@ const LandingPage = () => {
     const [email, setEmail] = useState("")
     const [isSubmitted, setIsSubmitted] = useState(false)
     const [theme, setTheme] = useState("light")
-    const [mounted, setMounted] = useState(false)
+    const [mounted, setMounted] = useState(true)
+    const [isMobile, setIsMobile] = useState(false);
+
+    useEffect(() => {
+        const handleResize = () => {
+            setIsMobile(window.innerWidth < 768);
+        };
+
+        handleResize(); // run once on mount
+
+        window.addEventListener("resize", handleResize);
+        return () => window.removeEventListener("resize", handleResize);
+    }, []);
+
 
     useEffect(() => {
         setMounted(true)
@@ -458,7 +471,7 @@ const LandingPage = () => {
     return (
         <div className="flex min-h-screen flex-col">
             {/* Complete CSS Styles */}
-            <style jsx>{`
+            <style>{`
                 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap");
 
                 :root {
@@ -1375,7 +1388,7 @@ const LandingPage = () => {
                         </Motion>
                     </div>
 
-                    <div className="flex items-center gap-4 md:hidden">
+                    <div className={isMobile ? "flex items-center gap-4" : "flex items-center gap-4 md:hidden"}>
                         <Button variant="ghost" size="icon" onClick={toggleTheme} className="rounded-full">
                             {mounted && theme === "dark" ? (
                                 <Sun className="w-[18px] h-[18px]" />
@@ -1392,12 +1405,7 @@ const LandingPage = () => {
 
                 {/* Mobile menu */}
                 {mobileMenuOpen && (
-                    <Motion
-                        initial={{ opacity: 0, y: -20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.3 }}
-                        className="md:hidden absolute top-16 inset-x-0 bg-background/95 backdrop-blur-lg border-b"
-                    >
+                    <div className={isMobile ? "absolute top-16 left-0 right-0 bg-background/95 backdrop-blur-lg border-b z-50 shadow-lg" : "md:hidden absolute top-16 left-0 right-0 bg-background/95 backdrop-blur-lg border-b z-50 shadow-lg"}>
                         <div className="container py-4 flex flex-col gap-4">
                             {["Features", "Reviews", "Pricing", "FAQ"].map((item) => (
                                 <a
@@ -1410,7 +1418,11 @@ const LandingPage = () => {
                                 </a>
                             ))}
                             <div className="flex flex-col gap-2 pt-2 border-t">
-                                <a href="#" className="py-2 text-sm font-medium" onClick={() => setMobileMenuOpen(false)}>
+                                <a
+                                    href="#"
+                                    className="py-2 text-sm font-medium"
+                                    onClick={() => setMobileMenuOpen(false)}
+                                >
                                     Sign In
                                 </a>
                                 <Button className="rounded-full">
@@ -1419,8 +1431,9 @@ const LandingPage = () => {
                                 </Button>
                             </div>
                         </div>
-                    </Motion>
+                    </div>
                 )}
+
             </header>
 
             <main className="flex-1">
